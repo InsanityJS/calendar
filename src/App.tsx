@@ -1,25 +1,56 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
+import Calendar from './pages/calendar';
+import { styled, createGlobalStyle } from 'styled-components';
+import { ApiCalls } from './services/api';
+import CallendarAside from './components/CallendarAside';
+import { CalendarProvider } from './utils/CalendarContext';
+
+const GlobalStyle = createGlobalStyle`
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+`;
+
+const Wrapper = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100vh;
+`;
 
 function App() {
+  const fetching = useRef(true);
+  const [holidays, setHolidays] = useState([]);
+
+  useEffect(() => {
+    const fetchHolidays = async () => {
+      try {
+        const result = await ApiCalls.GetWorldwideHolidays();
+        console.log(result);
+        setHolidays(result);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (fetching.current) {
+      fetching.current = false;
+      fetchHolidays();
+    }
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <GlobalStyle />
+      <Wrapper>
+        <CalendarProvider holidays={holidays} weekStartsOn={1}>
+          <CallendarAside />
+          <Calendar />
+        </CalendarProvider>
+      </Wrapper>
+    </>
   );
 }
 
