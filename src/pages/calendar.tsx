@@ -45,7 +45,6 @@ const Calendar: React.FunctionComponent = () => {
       <DragDropContext onDragEnd={onDragEnd}>
         <CalendarCells />
       </DragDropContext>
-
       <TaskModal />
     </Wrapper>
   );
